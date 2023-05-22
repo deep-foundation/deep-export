@@ -72,29 +72,45 @@ async function exportData(url, jwt, filename  = `dump-${moment(current_time).for
                 if (item?.__typename){
                     delete item.__typename
                 }
+                if (item?.object === null){
+                    delete item.object
+                }
+                if (item?.string === null){
+                    delete item.string
+                }
+                if (item?.number === null){
+                    delete item.number
+                }
             }
 
             fs.writeFileSync(filename, JSON.stringify(links), (err) => {
                 if (err) throw err;
                 console.log('File saved!');
             });
-
-            console.log(result.data)
         })
         .catch((error) => console.error(error));
 }
 
 yargs(hideBin(process.argv))
-    .command('deep-export', '', (yargs) => {
-        return yargs
-            .option('url', { describe: 'The url to export data from', type: 'string', demandOption: true })
-            .option('jwt', { describe: 'The JWT token', type: 'string', demandOption: true })
-            .option('file', { describe: 'The file to save data to', type: 'string', demandOption: false });
-
-    }, (argv) => {
-        exportData(argv.url, argv.jwt, argv.file)
-            .catch((error) => console.error(error));
+    .option('url', {
+        describe: 'The url to export data from',
+        type: 'string',
+        demandOption: true,
     })
-    .demandCommand(1, 'You need at least one command before moving on')
+    .option('jwt', {
+        describe: 'The JWT token',
+        type: 'string',
+        demandOption: true,
+    })
+    .option('file', {
+        describe: 'The file to save data to',
+        type: 'string',
+        demandOption: false,
+    })
     .help()
-    .argv;
+    .parseAsync()
+    .then((argv) => {
+        exportData(argv.url, argv.jwt, argv.file).catch((error) =>
+            console.error(error)
+        );
+    });
