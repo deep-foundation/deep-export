@@ -1,8 +1,3 @@
 .idea
-.env
 .gitignore
-.graphqlconfig
 schema.graphql
-Saves
-node_modules
-untitled1.iml
