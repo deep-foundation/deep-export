@@ -7,6 +7,7 @@ import { hideBin } from 'yargs/helpers';
 import { stripSymbols } from 'apollo-utilities';
 import moment from "moment";
 let current_time = Date.now();
+import axios from "axios";
 import {generateApolloClient,} from "@deep-foundation/hasura/client.js";
 
 
@@ -35,17 +36,37 @@ function getLinksGreaterThanId(client, id) {
     return client.query({
         query: gql`query ExportLinks {
             links(order_by: { id: asc }, where: { id: { _gte: ${id} } }) {
-                id
                 from_id
+                id
                 to_id
                 type_id
+                value
+                file {
+                    bucketId
+                    createdAt
+                    etag
+                    id
+                    isUploaded
+                    mimeType
+                    name
+                    size
+                    updatedAt
+                    uploadedByLinkId
+                    uploadedByUserId
+                }
+                number {
+                    id
+                    link_id
+                    value
+                }
                 object {
+                    id
+                    link_id
                     value
                 }
                 string {
-                    value
-                }
-                number {
+                    id
+                    link_id
                     value
                 }
             }
@@ -53,8 +74,42 @@ function getLinksGreaterThanId(client, id) {
         `,
     })
 }
-async function exportData(url, jwt, filename  = `dump-${moment(current_time).format("YYYY-MM-DD-HH-mm-ss")}.json`) {
+function getFiles(client) {
+    return client.query({
+        query: gql`
+            query Files {
+                files {
+                    bucketId
+                    createdAt
+                    etag
+                    id
+                    isUploaded
+                    link_id
+                    mimeType
+                    name
+                    size
+                    updatedAt
+                    uploadedByLinkId
+                    uploadedByUserId
+                    link {
+                        from_id
+                        id
+                        to_id
+                        type_id
+                        value
+                    }
+                }
+            }
+
+        `,
+    })
+}
+async function exportData(url, jwt, filename  = `dump-${moment(current_time).format("YYYY-MM-DD-HH-mm-ss")}`) {
     const client = createApolloClient(url, jwt)
+    const ssl = client.ssl;
+    const path = client.path.slice(0, -4);
+
+
     getLinksGreaterThanId(client, await getMigrationsEndId(client))
         .then((result) => {
             let links = stripSymbols(result)
@@ -81,14 +136,54 @@ async function exportData(url, jwt, filename  = `dump-${moment(current_time).for
                 if (item?.number === null){
                     delete item.number
                 }
+                if (item?.file === null){
+                    delete item.file
+                }
             }
 
-            fs.writeFileSync(filename, JSON.stringify(links), (err) => {
+            fs.writeFileSync(filename + ".json", JSON.stringify(links), (err) => {
                 if (err) throw err;
                 console.log('File saved!');
             });
         })
         .catch((error) => console.error(error));
+    getFiles(client).then(
+        (r) => {
+            const files = r["data"]["files"]
+            for (let i= 0; i < files.length; i++) {
+                let savedfilename = files[i].name
+                const extension = savedfilename.split('.').pop();
+                const fileurl = `${ssl ? "https://" : "http://"}${path}/file?linkId=${files[i].link_id}`;
+                console.log(fileurl)
+                fs.mkdir(`${filename}`, { recursive: true }, (err) => {
+                    if (err) {
+                        console.error(err);
+                    } else {
+                        console.log('Dir created.');
+                    }
+                });
+                axios.get(fileurl, {
+                    headers: {
+                        'Authorization': `Bearer ${jwt}`
+                    },
+                    responseType: 'stream'
+                }).then(function (response) {
+                    const writer = fs.createWriteStream(`${filename}/${files[i].link_id}.` + extension);
+                    response.data.pipe(writer);
+                    writer.on('finish', () => {
+                        console.log('The file has been saved!');
+                    });
+                    writer.on('error', (err) => {
+                        console.error('There was an error writing the file', err);
+                    });
+                })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            }
+        }
+    )
+
 }
 
 yargs(hideBin(process.argv))
