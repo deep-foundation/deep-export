@@ -168,10 +168,10 @@ async function exportData(url, jwt, filename  = `dump-${moment(current_time).for
         (r) => {
             const files = r["data"]["files"]
             for (let i= 0; i < files.length; i++) {
-                let savedfilename = files[i].name
-                const extension = savedfilename.split('.').pop();
-                const fileurl = `${ssl ? "https://" : "http://"}${path}/file?linkId=${files[i].link_id}`;
-                axios.get(fileurl, {
+                let savedFileName = files[i].name
+                const extension = savedFileName.split('.').pop();
+                const fileUrl = `${ssl ? "https://" : "http://"}${path}/file?linkId=${files[i].link_id}`;
+                axios.get(fileUrl, {
                     headers: {
                         'Authorization': `Bearer ${jwt}`
                     },
