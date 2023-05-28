@@ -12,10 +12,21 @@ import {generateApolloClient,} from "@deep-foundation/hasura/client.js";
 
 
 function createApolloClient(uri) {
+    const url = new URL(uri);
+    let ssl;
+
+    if (url.protocol === "https:") {
+        ssl = 1;
+    } else if (url.protocol === "http:") {
+        ssl = 0;
+    } else {
+        throw new Error(`Unsupported protocol: ${url.protocol}`);
+    }
+    const path = url.hostname + url.pathname
     return generateApolloClient(
         {
-            path: uri.replace("https://", ""),
-            ssl: 1,
+            path,
+            ssl,
             token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWFsbG93ZWQtcm9sZXMiOlsiYWRtaW4iXSwieC1oYXN1cmEtZGVmYXVsdC1yb2xlIjoiYWRtaW4iLCJ4LWhhc3VyYS11c2VyLWlkIjoiMzc4In0sImlhdCI6MTY4MzkzODI0Nn0.u_J5KUZZWfUKIyhHprcGbx__a_GrKL1ETwwuwpxz5JQ'
         }
     )
@@ -140,8 +151,14 @@ async function exportData(url, jwt, filename  = `dump-${moment(current_time).for
                     delete item.file
                 }
             }
-
-            fs.writeFileSync(filename + ".json", JSON.stringify(links), (err) => {
+            fs.mkdirSync(`${filename}`, { recursive: true }, (err) => {
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.log('Dir created.');
+                }
+            });
+            fs.writeFileSync(`${filename}/${filename}` + ".json", JSON.stringify(links), (err) => {
                 if (err) throw err;
                 console.log('File saved!');
             });
@@ -154,14 +171,6 @@ async function exportData(url, jwt, filename  = `dump-${moment(current_time).for
                 let savedfilename = files[i].name
                 const extension = savedfilename.split('.').pop();
                 const fileurl = `${ssl ? "https://" : "http://"}${path}/file?linkId=${files[i].link_id}`;
-                console.log(fileurl)
-                fs.mkdir(`${filename}`, { recursive: true }, (err) => {
-                    if (err) {
-                        console.error(err);
-                    } else {
-                        console.log('Dir created.');
-                    }
-                });
                 axios.get(fileurl, {
                     headers: {
                         'Authorization': `Bearer ${jwt}`
