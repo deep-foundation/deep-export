@@ -2,7 +2,10 @@
 <module type="GENERAL_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/dump-2023-05-28-19-24-34" />
+      <excludeFolder url="file://$MODULE_DIR$/dump-2023-05-28-19-27-09" />
+    </content>
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
