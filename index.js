@@ -66,18 +66,12 @@ function getLinksGreaterThanId(client, id) {
                     uploadedByUserId
                 }
                 number {
-                    id
-                    link_id
                     value
                 }
                 object {
-                    id
-                    link_id
                     value
                 }
                 string {
-                    id
-                    link_id
                     value
                 }
             }
