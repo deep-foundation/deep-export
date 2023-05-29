@@ -43,8 +43,8 @@ async function getMigrationsEndId(client) {
     });
     return result.data.links[0].id;
 }
-function getLinksGreaterThanId(client, id) {
-    return client.query({
+async function getLinksGreaterThanId(client, id) {
+    let result = await client.query({
         query: gql`query ExportLinks {
             links(order_by: { id: asc }, where: { id: { _gte: ${id} } }) {
                 from_id
@@ -78,9 +78,37 @@ function getLinksGreaterThanId(client, id) {
         }
         `,
     })
+    let links = stripSymbols(result).data.links.slice()
+    for (let item of links) {
+        if (item?.object?.__typename) {
+            delete item.object.__typename;
+        }
+        if (item?.string?.__typename) {
+            delete item.string.__typename;
+        }
+        if (item?.number?.__typename) {
+            delete item.number.__typename;
+        }
+        if (item?.__typename){
+            delete item.__typename
+        }
+        if (item?.object === null){
+            delete item.object
+        }
+        if (item?.string === null){
+            delete item.string
+        }
+        if (item?.number === null){
+            delete item.number
+        }
+        if (item?.file === null){
+            delete item.file
+        }
+    }
+    return links
 }
-function getFiles(client) {
-    return client.query({
+async function getFiles(client) {
+    let files = await client.query({
         query: gql`
             query Files {
                 files {
@@ -108,85 +136,50 @@ function getFiles(client) {
 
         `,
     })
+    return files["data"]["files"]
 }
 async function exportData(url, jwt, filename  = `dump-${moment(current_time).format("YYYY-MM-DD-HH-mm-ss")}`) {
     const client = createApolloClient(url, jwt)
     const ssl = client.ssl;
     const path = client.path.slice(0, -4);
 
-
-    getLinksGreaterThanId(client, await getMigrationsEndId(client))
-        .then((result) => {
-            let links = stripSymbols(result)
-            links = links.data.links.slice()
-            for (let item of links) {
-                if (item?.object?.__typename) {
-                    delete item.object.__typename;
-                }
-                if (item?.string?.__typename) {
-                    delete item.string.__typename;
-                }
-                if (item?.number?.__typename) {
-                    delete item.number.__typename;
-                }
-                if (item?.__typename){
-                    delete item.__typename
-                }
-                if (item?.object === null){
-                    delete item.object
-                }
-                if (item?.string === null){
-                    delete item.string
-                }
-                if (item?.number === null){
-                    delete item.number
-                }
-                if (item?.file === null){
-                    delete item.file
-                }
-            }
-            fs.mkdirSync(`${filename}`, { recursive: true }, (err) => {
-                if (err) {
-                    console.error(err);
-                } else {
-                    console.log('Dir created.');
-                }
-            });
-            fs.writeFileSync(`${filename}/${filename}` + ".json", JSON.stringify(links), (err) => {
-                if (err) throw err;
-                console.log('File saved!');
-            });
-        })
-        .catch((error) => console.error(error));
-    getFiles(client).then(
-        (r) => {
-            const files = r["data"]["files"]
-            for (let i= 0; i < files.length; i++) {
-                let savedFileName = files[i].name
-                const extension = savedFileName.split('.').pop();
-                const fileUrl = `${ssl ? "https://" : "http://"}${path}/file?linkId=${files[i].link_id}`;
-                axios.get(fileUrl, {
-                    headers: {
-                        'Authorization': `Bearer ${jwt}`
-                    },
-                    responseType: 'stream'
-                }).then(function (response) {
-                    const writer = fs.createWriteStream(`${filename}/${files[i].link_id}.` + extension);
-                    response.data.pipe(writer);
-                    writer.on('finish', () => {
-                        console.log('The file has been saved!');
-                    });
-                    writer.on('error', (err) => {
-                        console.error('There was an error writing the file', err);
-                    });
-                })
-                    .catch(function (error) {
-                        console.log(error);
-                    });
-            }
+    const links = await getLinksGreaterThanId(client, await getMigrationsEndId(client))
+    fs.mkdirSync(`${filename}`, { recursive: true }, (err) => {
+        if (err) {
+            console.error(err);
+        } else {
+            console.log('Dir created.');
         }
-    )
+    });
+    fs.writeFileSync(`${filename}/${filename}` + ".json", JSON.stringify(links), (err) => {
+        if (err) throw err;
+        console.log('File saved!');
+    });
+    const files = await getFiles(client)
+    for (let i = 0; i < files.length; i++) {
+        let savedFileName = files[i].name
+        const extension = savedFileName.split('.').pop();
+        const fileUrl = `${ssl ? "https://" : "http://"}${path}/file?linkId=${files[i].link_id}`;
+        try {
+            const response = await axios.get(fileUrl, {
+                headers: {
+                    'Authorization': `Bearer ${jwt}`
+                },
+                responseType: 'stream'
+            });
+            const writer = fs.createWriteStream(`${filename}/${file.link_id}.${extension}`);
+            response.data.pipe(writer);
 
+            writer.on('finish', () => {
+                console.log('The file has been saved!');
+            });
+            writer.on('error', (err) => {
+                console.error('There was an error writing the file', err);
+            });
+        } catch (error) {
+            console.log(error);
+        }
+    }
 }
 
 yargs(hideBin(process.argv))
