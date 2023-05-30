@@ -1,7 +1,7 @@
 {
   "name": "deep-export",
   "type": "module",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "bin": {
     "deep-export": "cli.js"
   },
@@ -17,7 +17,7 @@
     "yargs": "^17.7.2"
   },
   "description": "cli utility for export data from your deep",
-  "main": "cli.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
