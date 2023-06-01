@@ -6,7 +6,7 @@ import moment from "moment/moment.js";
 import fs from "fs";
 import axios from "axios";
 
-export function createApolloClient(uri) {
+export function createApolloClient(uri, jwt) {
     const url = new URL(uri);
     let ssl;
 
@@ -22,7 +22,7 @@ export function createApolloClient(uri) {
         {
             path,
             ssl,
-            token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwczovL2hhc3VyYS5pby9qd3QvY2xhaW1zIjp7IngtaGFzdXJhLWFsbG93ZWQtcm9sZXMiOlsiYWRtaW4iXSwieC1oYXN1cmEtZGVmYXVsdC1yb2xlIjoiYWRtaW4iLCJ4LWhhc3VyYS11c2VyLWlkIjoiMzc4In0sImlhdCI6MTY4MzkzODI0Nn0.u_J5KUZZWfUKIyhHprcGbx__a_GrKL1ETwwuwpxz5JQ'
+            token: jwt
         }
     )
 }
@@ -162,7 +162,7 @@ export async function exportData(url, jwt, filename  = `dump-${moment(Date.now()
                 },
                 responseType: 'stream'
             });
-            const writer = fs.createWriteStream(`${filename}/${file.link_id}.${extension}`);
+            const writer = fs.createWriteStream(`${filename}/${files[i].link_id}.${extension}`);
             response.data.pipe(writer);
 
             writer.on('finish', () => {
