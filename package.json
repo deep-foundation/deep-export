@@ -1,7 +1,7 @@
 {
   "name": "deep-export",
   "type": "module",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "bin": {
     "deep-export": "cli.js"
   },
