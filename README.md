@@ -8,16 +8,38 @@ Navigate to the root directory of the project and then run
 npm install --global deep-export
 ```
 
+# Synopsis
+
+```shell
+deep-export --url <url> --jwt <jwt> --file <file> [--overwrite] [--debug]
+```
+
 # Usage
-Explain how to use the code and provide examples of command-line usage.
-If downloaded locally:
-```shell
-npx deep-export --url <url> --jwt <jwt> --file <file> [--overwrite] [--debug]
+
+## Global/Local installed
+Use `npx`
 ```
-If downloaded globally:
-```shell
-deep-import --url <url> --jwt <jwt> --file <file> [--overwrite] [--debug]
+npx deep-export ...
 ```
+
+## Global installed
+```
+deep-export
+```
+
+## Local installed
+Add npm script that invokes `deep-export`
+`package.json`:
+```
+"scripts": {
+  "deep-export": "deep-export"
+}
+```
+and run it with arguments by using `npm run` and separating cli arguments by using `--` (otherwise your arguments will be considered as arguments for `npm run` command)
+```
+npm run deep-export -- ...
+```
+
 
 --url: The URL to export data from. (required)  
 --jwt: The JWT token. (required)  
