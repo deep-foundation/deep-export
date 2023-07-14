@@ -133,20 +133,20 @@ export async function getFiles(client) {
     })
     return files["data"]["files"]
 }
-export async function exportData(url, jwt, filename  = `dump-${moment(Date.now()).format("YYYY-MM-DD-HH-mm-ss")}`) {
+export async function exportData(url, jwt, directoryName  = `dump-${moment(Date.now()).format("YYYY-MM-DD-HH-mm-ss")}`) {
     const client = createApolloClient(url, jwt)
     const ssl = client.ssl;
     const path = client.path.slice(0, -4);
 
     const links = await getLinksGreaterThanId(client, await getMigrationsEndId(client))
-    fs.mkdirSync(`${filename}`, { recursive: true }, (err) => {
+    fs.mkdirSync(`${directoryName}`, { recursive: true }, (err) => {
         if (err) {
             console.error(err);
         } else {
             console.log('Dir created.');
         }
     });
-    fs.writeFileSync(`${filename}/${filename}` + ".json", JSON.stringify(links), (err) => {
+    fs.writeFileSync(`${directoryName}/${directoryName}` + ".json", JSON.stringify(links), (err) => {
         if (err) throw err;
         console.log('File saved!');
     });
@@ -162,7 +162,7 @@ export async function exportData(url, jwt, filename  = `dump-${moment(Date.now()
                 },
                 responseType: 'stream'
             });
-            const writer = fs.createWriteStream(`${filename}/${files[i].link_id}.${extension}`);
+            const writer = fs.createWriteStream(`${directoryName}/${files[i].link_id}.${extension}`);
             response.data.pipe(writer);
 
             writer.on('finish', () => {
