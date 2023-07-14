@@ -12,7 +12,7 @@ yargs(hideBin(process.argv))
         demandOption: true,
     })
     .option('jwt', {
-        describe: 'The JWT token',
+        describe: 'The JWT token for authentication to the graphql server',
         type: 'string',
         demandOption: true,
     })
