@@ -2,29 +2,50 @@
 Cli utility that allows you to export links from your deep.
 
 # Installation
-Navigate to the root directory of the project and then run
 
 ```shell
 npm install --global deep-export
 ```
 
+# Synopsis
+
+```shell
+deep-export --url <url> --jwt <jwt> --file <file> [--overwrite] [--debug]
+```
+`<>` - required  
+[] - optional
+
+`--url`: The URL to export data from. (required)  
+`--jwt`: The JWT token. (required)  
+`--file`: [Optional] Name of dump.
+`--overwrite`: Whether to overwrite your links if it already exists.   [Optional]  
+`--debug`: Allows you to see which links are inserted and in what order, which allows you to track down errors.  [Optional]  
+
 # Usage
-Explain how to use the code and provide examples of command-line usage.
-If downloaded locally:
-```shell
-npx deep-export --url <url> --jwt <jwt> --file <file> [--overwrite] [--debug]
+
+## Global/Local installed
+Use `npx`
 ```
-If downloaded globally:
-```shell
-deep-import --url <url> --jwt <jwt> --file <file> [--overwrite] [--debug]
+npx deep-export ...
 ```
 
---url: The URL to export data from. (required)  
---jwt: The JWT token. (required)  
---file: [Optional] Name of dump.
---overwrite: [Optional] Whether to overwrite your links if it already exists.  
---debug: [Optional] Allows you to see which links are inserted and in what order, which allows you to track down errors.
+## Global installed
+```
+deep-export
+```
 
+## Local installed
+Add npm script that invokes `deep-export`
+`package.json`:
+```
+"scripts": {
+  "deep-export": "deep-export"
+}
+```
+and run it with arguments by using `npm run` and separating cli arguments by using `--` (otherwise your arguments will be considered as arguments for `npm run` command)
+```
+npm run deep-export -- ...
+```
 
 # Related Links
 https://deep.foundation
