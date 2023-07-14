@@ -12,14 +12,14 @@ npm install --global deep-export
 ```shell
 deep-export --url <url> --jwt <jwt> --file <file> [--overwrite] [--debug]
 ```
-<> - required
+`<>` - required  
 [] - optional
 
---url: The URL to export data from. (required)  
---jwt: The JWT token. (required)  
---file: [Optional] Name of dump.
---overwrite: [Optional] Whether to overwrite your links if it already exists.  
---debug: [Optional] Allows you to see which links are inserted and in what order, which allows you to track down errors.
+`--url`: The URL to export data from. (required)  
+`--jwt`: The JWT token. (required)  
+`--file`: [Optional] Name of dump.
+`--overwrite`: Whether to overwrite your links if it already exists.   [Optional]  
+`--debug`: Allows you to see which links are inserted and in what order, which allows you to track down errors.  [Optional]  
 
 # Usage
 
