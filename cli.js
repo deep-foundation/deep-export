@@ -24,7 +24,7 @@ yargs(hideBin(process.argv))
     .help()
     .parseAsync()
     .then((argv) => {
-        exportData(argv.url, argv.jwt, argv.file).catch((error) =>
+        exportData(argv.url, argv.jwt, argv.directoryName).catch((error) =>
             console.error(error)
         );
     });
