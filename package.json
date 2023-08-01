@@ -3,7 +3,7 @@
   "type": "module",
   "version": "2.0.0",
   "bin": {
-    "deep-export": "cli.js"
+    "deep-export": "./dist/deep-export.js"
   },
   "dependencies": {
     "@apollo/client": "^3.7.14",
@@ -17,14 +17,22 @@
     "yargs": "^17.7.2"
   },
   "description": "cli utility for export data from your deep",
-  "main": "index.js",
+  "main": "./dist/main.js",
+  "types": "./dist/main.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "library:build:clean": "fse remove dist && npm run library:build:dirty",
+    "library:build:dirty": "ts-node --esm ./automation/library/build.ts",
+    "library:build:generate-package-class": "generate-package-class",
+    "documentation:generate": "cross-env DEBUG=* ts-node --esm ./automation/documentation/generate.ts",
+    "library:documentation:generate": "typedoc ./src/main.ts"
   },
   "author": "Arsentii",
   "license": "Unlicense",
   "repository": {
     "type": "git",
-    "url": "https://github.com/CEHR2005/deep-export"
+    "url": "https://github.com/deep-foundation/deep-export"
+  },
+  "devDependencies": {
+    "@types/yargs": "^17.0.24"
   }
 }

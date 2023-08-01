@@ -1,0 +1,1 @@
+export {exportData} from './deep-export.js'

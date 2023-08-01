@@ -135,21 +135,14 @@ export async function getFiles(client) {
 }
 export async function exportData(url, jwt, directoryName  = `dump-${moment(Date.now()).format("YYYY-MM-DD-HH-mm-ss")}`) {
     const client = createApolloClient(url, jwt)
+    // @ts-ignore
     const ssl = client.ssl;
+    // @ts-ignore
     const path = client.path.slice(0, -4);
 
     const links = await getLinksGreaterThanId(client, await getMigrationsEndId(client))
-    fs.mkdirSync(`${directoryName}`, { recursive: true }, (err) => {
-        if (err) {
-            console.error(err);
-        } else {
-            console.log('Dir created.');
-        }
-    });
-    fs.writeFileSync(`${directoryName}/${directoryName}` + ".json", JSON.stringify(links), (err) => {
-        if (err) throw err;
-        console.log('File saved!');
-    });
+    fs.mkdirSync(`${directoryName}`, { recursive: true });
+    fs.writeFileSync(`${directoryName}/${directoryName}` + ".json", JSON.stringify(links));
     const files = await getFiles(client)
     for (let i = 0; i < files.length; i++) {
         let savedFileName = files[i].name

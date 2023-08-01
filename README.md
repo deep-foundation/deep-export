@@ -1,52 +1,24 @@
-# Description
+[![npm](https://img.shields.io/npm/v/@deep-foundation/deep-export.svg)](https://www.npmjs.com/package/@deep-foundation/deep-export)
+[![Gitpod](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/deep-foundation/deep-export) 
+[![Discord](https://badgen.net/badge/icon/discord?icon=discord&label&color=purple)](https://discord.gg/deep-foundation)
+
 Cli utility that allows you to export links from your deep.
 
-# Installation
+# Table Of Contents
+<!-- TABLE_OF_CONTENTS_START -->
+<!-- TABLE_OF_CONTENTS_END -->
 
-```shell
-npm install --global deep-export
-```
+# Library
+See [Documentation] for examples and API
 
-# Synopsis
+# Cli
+## Cli Usage
+<!-- CLI_HELP_START -->
+<!-- CLI_HELP_END -->
 
-```shell
-deep-export --url <url> --jwt <jwt> --file <file> [--overwrite] [--debug]
-```
-`<>` - required  
-[] - optional
+## Cli Usage Ways
+<!-- CLI_USAGE_WAYS_START -->
+<!-- CLI_USAGE_WAYS_END -->
 
-`--url`: The URL to export data from. (required)  
-`--jwt`: The JWT token. (required)  
-`--file`: [Optional] Name of dump.
-`--overwrite`: Whether to overwrite your links if it already exists.   [Optional]  
-`--debug`: Allows you to see which links are inserted and in what order, which allows you to track down errors.  [Optional]  
+[Documentation]: https://deep-foundation.github.io/create-typescript-npm-package/
 
-# Usage
-
-## Global/Local installed
-Use `npx`
-```
-npx deep-export ...
-```
-
-## Global installed
-```
-deep-export
-```
-
-## Local installed
-Add npm script that invokes `deep-export`
-`package.json`:
-```
-"scripts": {
-  "deep-export": "deep-export"
-}
-```
-and run it with arguments by using `npm run` and separating cli arguments by using `--` (otherwise your arguments will be considered as arguments for `npm run` command)
-```
-npm run deep-export -- ...
-```
-
-# Related Links
-https://deep.foundation
-https://github.com/deep-foundation
