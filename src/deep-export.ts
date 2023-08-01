@@ -1,12 +1,12 @@
 import {generateApolloClient} from "@deep-foundation/hasura/client.js";
 import {stripSymbols} from "apollo-utilities";
-import pkg from '@apollo/client';
+import pkg, { ApolloClient } from '@apollo/client';
 const {gql} = pkg;
 import moment from "moment/moment.js";
 import fs from "fs";
 import axios from "axios";
 
-export function createApolloClient(uri, jwt) {
+export function createApolloClient(uri: string, jwt: string) {
     const url = new URL(uri);
     let ssl;
 
@@ -26,7 +26,7 @@ export function createApolloClient(uri, jwt) {
         }
     )
 }
-export async function getMigrationsEndId(client) {
+export async function getMigrationsEndId(client: ApolloClient<any>) {
     const result = await client.query({
         query: gql`
             query Links {
@@ -38,7 +38,7 @@ export async function getMigrationsEndId(client) {
     });
     return result.data.links[0].id;
 }
-export async function getLinksGreaterThanId(client, id) {
+export async function getLinksGreaterThanId(client: ApolloClient<any>, id: string) {
     let result = await client.query({
         query: gql`query ExportLinks {
             links(order_by: { id: asc }, where: { id: { _gte: ${id} } }) {
@@ -102,7 +102,7 @@ export async function getLinksGreaterThanId(client, id) {
     }
     return links
 }
-export async function getFiles(client) {
+export async function getFiles(client: ApolloClient<any>) {
     let files = await client.query({
         query: gql`
             query Files {
@@ -133,7 +133,7 @@ export async function getFiles(client) {
     })
     return files["data"]["files"]
 }
-export async function exportData(url, jwt, directoryName  = `dump-${moment(Date.now()).format("YYYY-MM-DD-HH-mm-ss")}`) {
+export async function exportData(url: string, jwt: string, directoryName: string  = `dump-${moment(Date.now()).format("YYYY-MM-DD-HH-mm-ss")}`) {
     const client = createApolloClient(url, jwt)
     // @ts-ignore
     const ssl = client.ssl;
